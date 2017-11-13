@@ -95,7 +95,7 @@ namespace Athena
             HmdTypes[config.HmdType].IsChecked = true;
         }
 
-        private Process ExecuteCommand(string command, bool dontWaitForExit = false)
+        private Process ExecuteCommand(string command, bool createNoWindow = false, bool dontWaitForExit = false)
         {
             Console.WriteLine(command);
             var scriptName = command;
@@ -130,7 +130,7 @@ namespace Athena
             }
 
             var processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
-            processInfo.CreateNoWindow = false;
+            processInfo.CreateNoWindow = createNoWindow;
             processInfo.UseShellExecute = false;
             //processInfo.RedirectStandardError = true;
             //processInfo.RedirectStandardOutput = true;
@@ -240,7 +240,7 @@ namespace Athena
                 {
                     command += " -debug";
                 }
-                ExecuteCommand(command);
+                ExecuteCommand(command, true);
             }
 
             if (config.StartGame)
@@ -254,7 +254,7 @@ namespace Athena
                     }
                     command += " ";
                     command += config.HmdTypeStrings[config.HmdType];
-                    ExecuteCommand(command);
+                    ExecuteCommand(command, true);
                 }
             }
         }
@@ -327,7 +327,7 @@ namespace Athena
         {
             if (GitAutoFetchProcess == null)
             {
-                GitAutoFetchProcess = ExecuteCommand("FrequentlyFetch.bat", true);
+                GitAutoFetchProcess = ExecuteCommand("FrequentlyFetch.bat", false, true);
                 GitAutoFetchProcess.Exited += (object _sender, System.EventArgs _e) =>
                 {
                     GitAutoFetchProcess = null;
@@ -340,6 +340,11 @@ namespace Athena
 
                 AutoFetch.IsEnabled = false;
             }
+        }
+
+        private void StartFrontend_Click(object sender, RoutedEventArgs e)
+        {
+            ExecuteCommand("StartFrontend.bat", true);
         }
     }
 }

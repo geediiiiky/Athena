@@ -5,21 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Athena"
         mc:Ignorable="d"
-        Title="Athena" Height="500
-        " Width="525">
+        Title="Athena" Height="540" Width="525">
     <Grid>
         <GroupBox Header="Generate Project Files" Height="60" Margin="2,0,2,0" VerticalAlignment="Top">
             <Grid>
                 <Button x:Name="GenerateProjectButton" Content="Generate Project" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="120" Click="GenerateProjectButton_Click"/>
-                <CheckBox x:Name="WithVS2017" Content="VisualStudio 2017" HorizontalAlignment="Left" Margin="160,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.398,-2.495" Checked="WithVS2017_Checked" Unchecked="WithVS2017_Unchecked" />
+                <CheckBox x:Name="WithVS2017" Content="VisualStudio 2017" HorizontalAlignment="Left" Margin="160,13,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.398,-2.495" Checked="WithVS2017_Checked" Unchecked="WithVS2017_Unchecked" ToolTip="Generate project files using VisualStudio 2017 instead of VisualStudio 2015" />
             </Grid>
         </GroupBox>
 
         <GroupBox Header="Build Editor" Height="90" Margin="2,70,2,0" VerticalAlignment="Top">
             <Grid>
                 <Button x:Name="BuildEditor" Content="Build Editor" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="BuildEditor_Click"/>
-                <CheckBox x:Name="BuildWithVS2017" Content="VisualStudio 2017" HorizontalAlignment="Left" Margin="110,13,0,0" VerticalAlignment="Top" Checked="BuildWithVS2017_Checked" Unchecked="BuildWithVS2017_Unchecked" />
-                <CheckBox x:Name="DebugGame" Content="DebugGame" HorizontalAlignment="Left" Margin="250,13,0,0" VerticalAlignment="Top" />
+                <CheckBox x:Name="BuildWithVS2017" Content="VisualStudio 2017" HorizontalAlignment="Left" Margin="110,13,0,0" VerticalAlignment="Top" Checked="BuildWithVS2017_Checked" Unchecked="BuildWithVS2017_Unchecked" ToolTip="Build editor using VisualStudio 2017 instead of VisualStudio 2015" />
+                <CheckBox x:Name="DebugGame" Content="DebugGame" HorizontalAlignment="Left" Margin="250,13,0,0" VerticalAlignment="Top" ToolTip="Build a DebugGame editor instead of a Development one." />
                 <CheckBox x:Name="SkipShaderCompiler" Content="Skip ShaderCompiler" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" />
                 <CheckBox x:Name="SkipFrontend" Content="Skip Frontend" HorizontalAlignment="Left" Margin="160,40,0,0" VerticalAlignment="Top" />
                 <CheckBox x:Name="SkipLightmass" Content="Skip Lightmass" HorizontalAlignment="Left" Margin="280,40,0,0" VerticalAlignment="Top" />
@@ -29,17 +28,17 @@
         <GroupBox Header="Run Game" Height="170" Margin="2,170,2,0" VerticalAlignment="Top">
             <Grid>
                 <CheckBox x:Name="StartServer" Content="Server" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                <CheckBox x:Name="StartServerDebug" Content="-Debug" HorizontalAlignment="Left" Margin="103,10,0,0" VerticalAlignment="Top"/>
+                <CheckBox x:Name="StartServerDebug" Content="-Debug" HorizontalAlignment="Left" Margin="103,10,0,0" VerticalAlignment="Top" ToolTip="Start the server using DebugGame binary instead of Development"/>
                 <Separator Margin="10,32,10,0" VerticalAlignment="Top" Foreground="Black" Background="#7FC8C8C8"/>
                 <CheckBox x:Name="StartGame" Content="Game" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top"/>
-                <CheckBox x:Name="StartGameDebug" Content="-Debug" HorizontalAlignment="Left" Margin="103,40,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.506,0.346"/>
+                <CheckBox x:Name="StartGameDebug" Content="-Debug" HorizontalAlignment="Left" Margin="103,40,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.506,0.346" ToolTip="Start the game using DebugGame binary instead of Development"/>
                 <TextBox x:Name="GameInstances" HorizontalAlignment="Left" Height="20" Margin="275,40,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="30" RenderTransformOrigin="0.5,0.55
                  "/>
-                <TextBlock HorizontalAlignment="Left" Margin="184,40,0,0" TextWrapping="Wrap" Text="Game Instances:" VerticalAlignment="Top" RenderTransformOrigin="-0.646,0.509"/>
+                <TextBlock HorizontalAlignment="Left" Margin="184,40,0,0" TextWrapping="Wrap" Text="Game Instances:" VerticalAlignment="Top" RenderTransformOrigin="-0.646,0.509" ToolTip="Number of game instances that will be started"/>
                 <GroupBox Header="Hmd Types" Height="60" Margin="5,60,20,0" VerticalAlignment="Top">
                     <Grid>
-                        <RadioButton x:Name="NoHmd" Content="No Hmd" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top"/>
-                        <RadioButton x:Name="DefaultHmd" Content="Default" HorizontalAlignment="Left" Margin="80,15,0,0" VerticalAlignment="Top"/>
+                        <RadioButton x:Name="NoHmd" Content="No Hmd" HorizontalAlignment="Left" Margin="0,15,0,0" VerticalAlignment="Top" ToolTip="Do not use HMD even if there are devices connected."/>
+                        <RadioButton x:Name="DefaultHmd" Content="Default" HorizontalAlignment="Left" Margin="80,15,0,0" VerticalAlignment="Top" ToolTip="Use the default HMD device (chosen by engine) if there are multiple"/>
                         <RadioButton x:Name="GoogleVR" Content="Google VR" HorizontalAlignment="Left" Margin="160,15,0,0" VerticalAlignment="Top"/>
                         <RadioButton x:Name="Occulus" Content="Occulus" HorizontalAlignment="Left" Margin="240,15,0,0" VerticalAlignment="Top"/>
                         <RadioButton x:Name="SteamVR" Content="SteamVR" HorizontalAlignment="Left" Margin="320,15,0,0" VerticalAlignment="Top"/>
@@ -51,8 +50,13 @@
 
         <GroupBox Header="Sync" Height="60" Margin="2,350,2,0" VerticalAlignment="Top">
             <Grid>
-                <Button x:Name="SyncGit" Content="Sync" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="SyncGit_Click"/>
-                <Button x:Name="AutoFetch" Content="Auto Fetch" HorizontalAlignment="Left" Margin="120,10,0,0" VerticalAlignment="Top" Width="100" Click="AutoFetch_Click"/>
+                <Button x:Name="SyncGit" Content="Sync" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Click="SyncGit_Click" ToolTip="fetch, lfs fetch, pull, and submodule update"/>
+                <Button x:Name="AutoFetch" Content="Auto Fetch" HorizontalAlignment="Left" Margin="120,10,0,0" VerticalAlignment="Top" Width="100" Click="AutoFetch_Click" ToolTip="Automatically fetch and lfs fetch every given interval"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Frontend" Height="60" Margin="2,420,2,0" VerticalAlignment="Top">
+            <Grid>
+                <Button x:Name="StartFrontend" Content="Start Frontend" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" ToolTip="Start the frontend if it is compiled" Click="StartFrontend_Click"/>
             </Grid>
         </GroupBox>
     </Grid>
