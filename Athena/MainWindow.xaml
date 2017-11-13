@@ -1,0 +1,33 @@
+﻿<Window x:Class="Athena.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Athena"
+        mc:Ignorable="d"
+        Title="Athena" Height="350" Width="525">
+    <Grid>
+        <Button x:Name="GenerateProjectButton" Content="Generate Project" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top" Width="120" Click="GenerateProjectButton_Click"/>
+        <CheckBox x:Name="WithVS2017" Content="Use VisualStudio 2017" HorizontalAlignment="Left" Margin="160,18,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.398,-2.495" />
+        <Separator Margin="0,50,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="BuildEditor" Content="Build Editor" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Width="75" Click="BuildEditor_Click"/>
+        <Separator Margin="0,100,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="StartServer" Content="Server" HorizontalAlignment="Left" Margin="15,115,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="StartServerDebug" Content="-Debug" HorizontalAlignment="Left" Margin="103,115,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="StartGame" Content="Game" HorizontalAlignment="Left" Margin="15,150,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="StartGameDebug" Content="-Debug" HorizontalAlignment="Left" Margin="103,150,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.506,0.346"/>
+        <TextBox x:Name="GameInstances" HorizontalAlignment="Left" Height="23" Margin="271,148,0,0" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="30" RenderTransformOrigin="0.5,0.55
+                 "/>
+        <TextBlock HorizontalAlignment="Left" Margin="184,150,0,0" TextWrapping="Wrap" Text="Game Instances" VerticalAlignment="Top" RenderTransformOrigin="-0.646,0.509"/>
+        <GroupBox Header="Hmd Types" Height="60" Margin="0,175,0,0" VerticalAlignment="Top">
+            <Grid>
+                <RadioButton x:Name="NoHmd" Content="No Hmd" HorizontalAlignment="Left" Margin="15,15,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="DefaultHmd" Content="Default" HorizontalAlignment="Left" Margin="115,15,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="GoogleVR" Content="Google VR" HorizontalAlignment="Left" Margin="215,15,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="Occulus" Content="Occulus" HorizontalAlignment="Left" Margin="315,15,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="SteamVR" Content="SteamVR" HorizontalAlignment="Left" Margin="415,15,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="Run" Content="Run" HorizontalAlignment="Left" Margin="15,249,0,0" VerticalAlignment="Top" Width="75" Click="Run_Click"/>
+    </Grid>
+</Window>
