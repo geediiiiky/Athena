@@ -30,16 +30,20 @@ namespace Athena
         };
 
         static public string FileName = "athena_config.json";
-        public bool _With2017 { get; set; } = false;
-        public bool _StartServer = false;
-        public bool _StartServerDebug = false;
-        public bool _StartGame = false;
-        public bool _StartGameDebug = false;
-        public int _GameInstances = 1;
-        public HMDTypes _HmdType = HMDTypes.Default;
+        public bool With2017 = false;
+        public bool SkipShaderCompiler = false;
+        public bool SkipFrontend = false;
+        public bool SkipLightmass = false;
+        public bool BuildDebugGame = false;
+        public bool StartServer = false;
+        public bool StartServerDebug = false;
+        public bool StartGame = false;
+        public bool StartGameDebug = false;
+        public int GameInstances = 1;
+        public HMDTypes HmdType = HMDTypes.Default;
 
         [ScriptIgnore]
-        public Dictionary<HMDTypes, string> _HmdTypeStrings = new Dictionary<HMDTypes, string>
+        public Dictionary<HMDTypes, string> HmdTypeStrings = new Dictionary<HMDTypes, string>
         {
             { HMDTypes.NoHmd, "-nohmd" },
             { HMDTypes.Default, "" },
@@ -56,36 +60,74 @@ namespace Athena
     {
 
         public AthenaConfig config = new AthenaConfig();
-        public Dictionary<AthenaConfig.HMDTypes, RadioButton> _HmdTypes = new Dictionary<AthenaConfig.HMDTypes, RadioButton> { };
+        public Process GitAutoFetchProcess;
+        public Dictionary<AthenaConfig.HMDTypes, RadioButton> HmdTypes = new Dictionary<AthenaConfig.HMDTypes, RadioButton> { };
 
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _HmdTypes.Add(AthenaConfig.HMDTypes.NoHmd, NoHmd);
-            _HmdTypes.Add(AthenaConfig.HMDTypes.Default, DefaultHmd);
-            _HmdTypes.Add(AthenaConfig.HMDTypes.GoogleVR, GoogleVR);
-            _HmdTypes.Add(AthenaConfig.HMDTypes.Occulus, Occulus);
-            _HmdTypes.Add(AthenaConfig.HMDTypes.SteamVR, SteamVR);
+            HmdTypes.Add(AthenaConfig.HMDTypes.NoHmd, NoHmd);
+            HmdTypes.Add(AthenaConfig.HMDTypes.Default, DefaultHmd);
+            HmdTypes.Add(AthenaConfig.HMDTypes.GoogleVR, GoogleVR);
+            HmdTypes.Add(AthenaConfig.HMDTypes.Occulus, Occulus);
+            HmdTypes.Add(AthenaConfig.HMDTypes.SteamVR, SteamVR);
 
             Load();
 
-            WithVS2017.IsChecked = config._With2017;
+            // generate project
+            WithVS2017.IsChecked = config.With2017;
 
-            StartServer.IsChecked = config._StartServer;
-            StartServerDebug.IsChecked = config._StartServerDebug;
+            // build
+            BuildWithVS2017.IsChecked = config.With2017;
+            SkipShaderCompiler.IsChecked = config.SkipShaderCompiler;
+            SkipFrontend.IsChecked = config.SkipFrontend;
+            SkipLightmass.IsChecked = config.SkipLightmass;
+            DebugGame.IsChecked = config.BuildDebugGame;
 
-            StartGame.IsChecked = config._StartGame;
-            StartGameDebug.IsChecked = config._StartGameDebug;
-            GameInstances.Text = config._GameInstances.ToString();
-
-            _HmdTypes[config._HmdType].IsChecked = true;
+            // run
+            StartServer.IsChecked = config.StartServer;
+            StartServerDebug.IsChecked = config.StartServerDebug;
+            StartGame.IsChecked = config.StartGame;
+            StartGameDebug.IsChecked = config.StartGameDebug;
+            GameInstances.Text = config.GameInstances.ToString();
+            HmdTypes[config.HmdType].IsChecked = true;
         }
 
-        private void ExecuteCommand(string command)
+        private Process ExecuteCommand(string command, bool dontWaitForExit = false)
         {
             Console.WriteLine(command);
+            var scriptName = command;
+            var scriptLength = command.IndexOf(" ");
+            if (scriptLength > 0)
+            {
+                scriptName = command.Substring(0, scriptLength);
+            }
+            var scriptFound = false;
+            if (File.Exists(scriptName))
+            {
+                scriptFound = true;
+            }
+            else
+            {
+                string[] folders = { @"script\", @"scripts\" };
+                foreach (var folder in folders)
+                {
+                    if (File.Exists(folder + scriptName))
+                    {
+                        command = folder + command;
+                        scriptFound = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!scriptFound)
+            {
+                Console.WriteLine("Script {0} cannot be found!!", scriptName);
+                return null;
+            }
 
             var processInfo = new ProcessStartInfo("cmd.exe", "/c " + command);
             processInfo.CreateNoWindow = false;
@@ -103,17 +145,30 @@ namespace Athena
             //    Console.WriteLine("error>>" + e.Data);
             //process.BeginErrorReadLine();
 
-            process.WaitForExit();
+            if (!dontWaitForExit)
+            {
+                process.WaitForExit();
+                Console.WriteLine("ExitCode: {0}", process.ExitCode);
+                process.Close();
+            }
+            else
+            {
+                process.EnableRaisingEvents = true;
+                process.Exited += (object sender, System.EventArgs e) =>
+                {
+                    process.Close();
+                };
+            }
 
-            Console.WriteLine("ExitCode: {0}", process.ExitCode);
-            process.Close();
+            return process;
         }
 
         private void GenerateProjectButton_Click(object sender, RoutedEventArgs e)
         {
-            config._With2017 = WithVS2017.IsChecked == true;
+            config.With2017 = WithVS2017.IsChecked == true;
+            Save();
 
-            if (!config._With2017)
+            if (!config.With2017)
             {
                 ExecuteCommand("GenerateProjectFiles.bat");
             }
@@ -125,52 +180,80 @@ namespace Athena
 
         private void BuildEditor_Click(object sender, RoutedEventArgs e)
         {
-            ExecuteCommand("BuildEditor.bat");
+            config.With2017 = BuildWithVS2017.IsChecked == true;
+            config.SkipShaderCompiler = SkipShaderCompiler.IsChecked == true;
+            config.SkipFrontend = SkipFrontend.IsChecked == true;
+            config.SkipLightmass = SkipLightmass.IsChecked == true;
+            config.BuildDebugGame = DebugGame.IsChecked == true;
+            Save();
+
+            string command = "BuildEditor.bat";
+            if (config.With2017)
+            {
+                command += " -2017";
+            }
+            if (config.SkipShaderCompiler)
+            {
+                command += " --no-shader-compiler";
+            }
+            if (config.SkipFrontend)
+            {
+                command += " --no-frontend";
+            }
+            if (config.SkipLightmass)
+            {
+                command += " --no-lightmass";
+            }
+            if (config.BuildDebugGame)
+            {
+                command += " --debug-game";
+            }
+            ExecuteCommand(command);
         }
 
         private void Run_Click(object sender, RoutedEventArgs e)
         {
-            config._StartServer = StartServer.IsChecked == true;
-            config._StartServerDebug = StartServerDebug.IsChecked == true;
+            config.StartServer = StartServer.IsChecked == true;
+            config.StartServerDebug = StartServerDebug.IsChecked == true;
 
-            config._StartGame = StartGame.IsChecked == true;
-            config._StartGameDebug = StartGameDebug.IsChecked == true;
-            config._GameInstances = 1;
-            Int32.TryParse(GameInstances.Text, out config._GameInstances);
+            config.StartGame = StartGame.IsChecked == true;
+            config.StartGameDebug = StartGameDebug.IsChecked == true;
+            config.GameInstances = 1;
+            Int32.TryParse(GameInstances.Text, out config.GameInstances);
 
-            config._HmdType = AthenaConfig.HMDTypes.Default;
-            foreach (KeyValuePair<AthenaConfig.HMDTypes, RadioButton> entry in _HmdTypes)
+            config.HmdType = AthenaConfig.HMDTypes.Default;
+            foreach (KeyValuePair<AthenaConfig.HMDTypes, RadioButton> entry in HmdTypes)
             {
                 if (entry.Value.IsChecked == true)
                 {
-                    config._HmdType = entry.Key;
+                    config.HmdType = entry.Key;
                     break;
                 }
             }
 
             Save();
 
-            if (config._StartServer)
+            if (config.StartServer)
             {
                 string command = "RunAssociatedEngine.cmd -log -server";
-                if (config._StartGameDebug)
+                if (config.StartGameDebug)
                 {
                     command += " -debug";
                 }
                 ExecuteCommand(command);
             }
 
-            if (config._StartGame)
+            if (config.StartGame)
             {
-                for (int i = 0; i < config._GameInstances; ++i)
+                for (int i = 0; i < config.GameInstances; ++i)
                 {
                     string command = "RunAssociatedEngine.cmd -log -game -resx=1280 -resy=720 -windowed";
-                    if (config._StartGameDebug)
+                    if (config.StartGameDebug)
                     {
                         command += " -debug";
                     }
                     command += " ";
-                    command += config._HmdTypeStrings[config._HmdType];
+                    command += config.HmdTypeStrings[config.HmdType];
                     ExecuteCommand(command);
                 }
             }
@@ -208,8 +291,54 @@ namespace Athena
                 finally
                 {
                     if (reader != null)
+                    {
                         reader.Close();
+                    }
                 }
+            }
+        }
+
+        private void WithVS2017_Checked(object sender, RoutedEventArgs e)
+        {
+            BuildWithVS2017.IsChecked = WithVS2017.IsChecked;
+        }
+
+        private void WithVS2017_Unchecked(object sender, RoutedEventArgs e)
+        {
+            BuildWithVS2017.IsChecked = WithVS2017.IsChecked;
+        }
+
+        private void BuildWithVS2017_Checked(object sender, RoutedEventArgs e)
+        {
+            WithVS2017.IsChecked = BuildWithVS2017.IsChecked;
+        }
+
+        private void BuildWithVS2017_Unchecked(object sender, RoutedEventArgs e)
+        {
+            WithVS2017.IsChecked = BuildWithVS2017.IsChecked;
+        }
+
+        private void SyncGit_Click(object sender, RoutedEventArgs e)
+        {
+            ExecuteCommand("Sync.bat");
+        }
+
+        private void AutoFetch_Click(object sender, RoutedEventArgs e)
+        {
+            if (GitAutoFetchProcess == null)
+            {
+                GitAutoFetchProcess = ExecuteCommand("FrequentlyFetch.bat", true);
+                GitAutoFetchProcess.Exited += (object _sender, System.EventArgs _e) =>
+                {
+                    GitAutoFetchProcess = null;
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        AutoFetch.IsEnabled = true;
+                    });
+                    
+                };
+
+                AutoFetch.IsEnabled = false;
             }
         }
     }
