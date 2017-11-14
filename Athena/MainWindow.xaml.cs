@@ -35,9 +35,7 @@ namespace Athena
         public bool SkipFrontend = false;
         public bool SkipLightmass = false;
         public bool BuildDebugGame = false;
-        public bool StartServer = false;
         public bool StartServerDebug = false;
-        public bool StartGame = false;
         public bool StartGameDebug = false;
         public int GameInstances = 1;
         public HMDTypes HmdType = HMDTypes.Default;
@@ -87,9 +85,7 @@ namespace Athena
             DebugGame.IsChecked = config.BuildDebugGame;
 
             // run
-            StartServer.IsChecked = config.StartServer;
             StartServerDebug.IsChecked = config.StartServerDebug;
-            StartGame.IsChecked = config.StartGame;
             StartGameDebug.IsChecked = config.StartGameDebug;
             GameInstances.Text = config.GameInstances.ToString();
             HmdTypes[config.HmdType].IsChecked = true;
@@ -213,14 +209,9 @@ namespace Athena
 
         private void Run_Click(object sender, RoutedEventArgs e)
         {
-            config.StartServer = StartServer.IsChecked == true;
-            config.StartServerDebug = StartServerDebug.IsChecked == true;
-
-            config.StartGame = StartGame.IsChecked == true;
             config.StartGameDebug = StartGameDebug.IsChecked == true;
             config.GameInstances = 1;
             Int32.TryParse(GameInstances.Text, out config.GameInstances);
-
             config.HmdType = AthenaConfig.HMDTypes.Default;
             foreach (KeyValuePair<AthenaConfig.HMDTypes, RadioButton> entry in HmdTypes)
             {
@@ -230,33 +221,32 @@ namespace Athena
                     break;
                 }
             }
-
             Save();
-
-            if (config.StartServer)
+            
+            for (int i = 0; i < config.GameInstances; ++i)
             {
-                string command = "RunAssociatedEngine.cmd -log -server";
+                string command = "RunAssociatedEngine.cmd -log -game -resx=1280 -resy=720 -windowed";
                 if (config.StartGameDebug)
                 {
                     command += " -debug";
                 }
+                command += " ";
+                command += config.HmdTypeStrings[config.HmdType];
                 ExecuteCommand(command, true);
             }
+        }
 
-            if (config.StartGame)
+        private void RunServer_Click(object sender, RoutedEventArgs e)
+        {
+            config.StartServerDebug = StartServerDebug.IsChecked == true;
+            Save();
+
+            string command = "RunAssociatedEngine.cmd -log -server";
+            if (config.StartGameDebug)
             {
-                for (int i = 0; i < config.GameInstances; ++i)
-                {
-                    string command = "RunAssociatedEngine.cmd -log -game -resx=1280 -resy=720 -windowed";
-                    if (config.StartGameDebug)
-                    {
-                        command += " -debug";
-                    }
-                    command += " ";
-                    command += config.HmdTypeStrings[config.HmdType];
-                    ExecuteCommand(command, true);
-                }
+                command += " -debug";
             }
+            ExecuteCommand(command, true);
         }
 
         private void Save()
@@ -346,5 +336,7 @@ namespace Athena
         {
             ExecuteCommand("StartFrontend.bat", true);
         }
+
+       
     }
 }
