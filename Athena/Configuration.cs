@@ -30,12 +30,17 @@ namespace Athena
         public int gameInstances = 1;
         public HMDTypes gameHmdType = HMDTypes.Default;
         public HMDTypes editorHmdType = HMDTypes.Default;
+        public RunParametersConfig editorParam = new RunParametersConfig();
         public RunParametersConfig gameParam = new RunParametersConfig();
         public RunParametersConfig serverParam = new RunParametersConfig();
+        public int editorExtraParamHash = 0;
+        public int serverExtraParamHash = 0;
+        public int gameExtraParamHash = 0;
     }
 
     public class SharedConfig
     {
+        public RunParametersConfig editorParam = new RunParametersConfig();
         public RunParametersConfig gameParam = new RunParametersConfig();
         public RunParametersConfig serverParam = new RunParametersConfig();
     }
@@ -50,17 +55,16 @@ namespace Athena
         [ScriptIgnore]
         public Dictionary<HMDTypes, string> HmdTypeStrings = new Dictionary<HMDTypes, string>
         {
-            { HMDTypes.NoHmd, "-nohmd" },
+            { HMDTypes.NoHmd, " -nohmd" },
             { HMDTypes.Default, "" },
-            { HMDTypes.GoogleVR, "-hmd=SteamVR" },
-            { HMDTypes.Occulus, "-hmd=OculusRift" },
-            { HMDTypes.SteamVR, "-hmd=googlevrhmd" }
+            { HMDTypes.GoogleVR, " -hmd=SteamVR" },
+            { HMDTypes.Occulus, " -hmd=OculusRift" },
+            { HMDTypes.SteamVR, " -hmd=googlevrhmd" }
         };
 
         public static void Save(AthenaConfig config)
         {
             InternalSave<UserConfig>(userConfigFileName, config.userConfig);
-            InternalSave<SharedConfig>(sharedConfigFileName, config.sharedConfig);
         }
 
         public static void InternalSave<T>(string filename, T config)
@@ -129,7 +133,6 @@ namespace Athena
     {
         public struct RunParameter
         {
-            public int Id;
             public string Param;
         }
 

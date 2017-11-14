@@ -214,8 +214,9 @@ namespace Athena
                 {
                     command += " -debug";
                 }
-                command += " ";
                 command += config.HmdTypeStrings[config.userConfig.gameHmdType];
+                command += " ";
+                command += GetExtraParameter(config.sharedConfig.gameParam, config.userConfig.gameParam, config.userConfig.gameExtraParamHash);
                 ExecuteCommand(command, true);
             }
         }
@@ -239,8 +240,9 @@ namespace Athena
             {
                 command += " -debug";
             }
-            command += " ";
             command += config.HmdTypeStrings[config.userConfig.editorHmdType];
+            command += " ";
+            command += GetExtraParameter(config.sharedConfig.editorParam, config.userConfig.editorParam, config.userConfig.editorExtraParamHash);
             ExecuteCommand(command, true);
         }
 
@@ -254,6 +256,8 @@ namespace Athena
             {
                 command += " -debug";
             }
+            command += " ";
+            command += GetExtraParameter(config.sharedConfig.serverParam, config.userConfig.serverParam, config.userConfig.serverExtraParamHash);
             ExecuteCommand(command, true);
         }
 
@@ -350,11 +354,57 @@ namespace Athena
 
         private void ServerParameters_Click(object sender, RoutedEventArgs e)
         {
-            ParameterWindow parameterWindow = new ParameterWindow();
+            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.serverParam, config.userConfig.serverParam, config.userConfig.serverExtraParamHash);
+            parameterWindow.ParameterModified += (int selectedHash) => 
+            {
+                config.userConfig.serverExtraParamHash = selectedHash;
+                Save();
+            };
             parameterWindow.ShowDialog();
         }
 
-        
+        private void GameParameters_Click(object sender, RoutedEventArgs e)
+        {
+            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.gameParam, config.userConfig.gameParam, config.userConfig.gameExtraParamHash);
+            parameterWindow.ParameterModified += (int selectedHash) =>
+            {
+                config.userConfig.gameExtraParamHash = selectedHash;
+                Save();
+            };
+            parameterWindow.ShowDialog();
+        }
+
+        private void EditorParameters_Click(object sender, RoutedEventArgs e)
+        {
+            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.editorParam, config.userConfig.editorParam, config.userConfig.editorExtraParamHash);
+            parameterWindow.ParameterModified += (int selectedHash) =>
+            {
+                config.userConfig.editorExtraParamHash = selectedHash;
+                Save();
+            };
+            parameterWindow.ShowDialog();
+        }
+
+        private string GetExtraParameter(RunParametersConfig shared, RunParametersConfig user, int selectedHash)
+        {
+            foreach (var param in shared.Parameters)
+            {
+                if (param.Param.GetHashCode() == selectedHash)
+                {
+                    return param.Param;
+                }
+            }
+
+            foreach (var param in user.Parameters)
+            {
+                if (param.Param.GetHashCode() == selectedHash)
+                {
+                    return param.Param;
+                }
+            }
+
+            return "";
+        }
     }
 
     

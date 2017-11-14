@@ -1,0 +1,23 @@
+{
+    "editorParam": {
+        "Parameters": [
+            {
+                "Param": "-log"
+            }
+        ]
+    },
+    "gameParam": {
+        "Parameters": [
+            {
+                "Param": "-log"
+            }
+        ]
+    },
+    "serverParam": {
+        "Parameters": [
+            {
+                "Param": "-log"
+            }
+        ]
+    }
+}
