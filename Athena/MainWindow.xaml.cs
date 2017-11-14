@@ -26,18 +26,29 @@ namespace Athena
 
         public AthenaConfig config = new AthenaConfig();
         public Process GitAutoFetchProcess;
-        public Dictionary<HMDTypes, RadioButton> HmdTypes = new Dictionary<HMDTypes, RadioButton> { };
+        public Dictionary<HMDTypes, RadioButton> gameHmdType2RadioButton;
+        public Dictionary<HMDTypes, RadioButton> editorHmdType2RadioButton;
 
 
         public MainWindow()
         {
             InitializeComponent();
 
-            HmdTypes.Add(HMDTypes.NoHmd, NoHmd);
-            HmdTypes.Add(HMDTypes.Default, DefaultHmd);
-            HmdTypes.Add(HMDTypes.GoogleVR, GoogleVR);
-            HmdTypes.Add(HMDTypes.Occulus, Occulus);
-            HmdTypes.Add(HMDTypes.SteamVR, SteamVR);
+            gameHmdType2RadioButton = new Dictionary<HMDTypes, RadioButton> {
+                { HMDTypes.NoHmd, GameNoHmd },
+                { HMDTypes.Default, GameDefaultHmd },
+                { HMDTypes.GoogleVR, GameGoogleVR },
+                { HMDTypes.Occulus, GameOcculus },
+                { HMDTypes.SteamVR, GameSteamVR }
+            };
+
+            editorHmdType2RadioButton = new Dictionary<HMDTypes, RadioButton> {
+                { HMDTypes.NoHmd, EditorNoHmd },
+                { HMDTypes.Default, EditorDefaultHmd },
+                { HMDTypes.GoogleVR, EditorGoogleVR },
+                { HMDTypes.Occulus, EditorOcculus },
+                { HMDTypes.SteamVR, EditorSteamVR }
+            };
 
             Load();
 
@@ -51,11 +62,17 @@ namespace Athena
             SkipLightmass.IsChecked = config.userConfig.skipLightmass;
             DebugGame.IsChecked = config.userConfig.buildDebugGame;
 
-            // run
+            // editor
+            StartEditorDebug.IsChecked = config.userConfig.startEditorDebug;
+            editorHmdType2RadioButton[config.userConfig.editorHmdType].IsChecked = true;
+
+            // run server
             StartServerDebug.IsChecked = config.userConfig.startServerDebug;
+
+            // run game
             StartGameDebug.IsChecked = config.userConfig.startGameDebug;
             GameInstances.Text = config.userConfig.gameInstances.ToString();
-            HmdTypes[config.userConfig.hmdType].IsChecked = true;
+            gameHmdType2RadioButton[config.userConfig.gameHmdType].IsChecked = true;
         }
 
         private Process ExecuteCommand(string command, bool createNoWindow = false, bool dontWaitForExit = false)
@@ -174,17 +191,17 @@ namespace Athena
             ExecuteCommand(command);
         }
 
-        private void Run_Click(object sender, RoutedEventArgs e)
+        private void RunGame_Click(object sender, RoutedEventArgs e)
         {
             config.userConfig.startGameDebug = StartGameDebug.IsChecked == true;
             config.userConfig.gameInstances = 1;
             Int32.TryParse(GameInstances.Text, out config.userConfig.gameInstances);
-            config.userConfig.hmdType = HMDTypes.Default;
-            foreach (KeyValuePair<HMDTypes, RadioButton> entry in HmdTypes)
+            config.userConfig.gameHmdType = HMDTypes.Default;
+            foreach (KeyValuePair<HMDTypes, RadioButton> entry in gameHmdType2RadioButton)
             {
                 if (entry.Value.IsChecked == true)
                 {
-                    config.userConfig.hmdType = entry.Key;
+                    config.userConfig.gameHmdType = entry.Key;
                     break;
                 }
             }
@@ -198,9 +215,33 @@ namespace Athena
                     command += " -debug";
                 }
                 command += " ";
-                command += config.HmdTypeStrings[config.userConfig.hmdType];
+                command += config.HmdTypeStrings[config.userConfig.gameHmdType];
                 ExecuteCommand(command, true);
             }
+        }
+
+        private void RunEditor_Click(object sender, RoutedEventArgs e)
+        {
+            config.userConfig.startEditorDebug = StartEditorDebug.IsChecked == true;
+            config.userConfig.editorHmdType = HMDTypes.Default;
+            foreach (KeyValuePair<HMDTypes, RadioButton> entry in editorHmdType2RadioButton)
+            {
+                if (entry.Value.IsChecked == true)
+                {
+                    config.userConfig.editorHmdType = entry.Key;
+                    break;
+                }
+            }
+            Save();
+
+            string command = "RunAssociatedEngine.cmd";
+            if (config.userConfig.startEditorDebug)
+            {
+                command += " -debug";
+            }
+            command += " ";
+            command += config.HmdTypeStrings[config.userConfig.editorHmdType];
+            ExecuteCommand(command, true);
         }
 
         private void RunServer_Click(object sender, RoutedEventArgs e)
@@ -312,6 +353,8 @@ namespace Athena
             ParameterWindow parameterWindow = new ParameterWindow();
             parameterWindow.ShowDialog();
         }
+
+        
     }
 
     

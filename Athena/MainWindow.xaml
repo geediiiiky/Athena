@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Athena"
         mc:Ignorable="d"
-        Title="Athena" Height="600" Width="525" Closed="Window_Closed">
+        Title="Athena" Height="720" Width="525" Closed="Window_Closed">
     <Window.Resources>
         <Style TargetType="FrameworkElement" x:Key="BaseStyle">
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -44,6 +44,24 @@
                     </StackPanel>
                 </GroupBox>
 
+                <GroupBox Header="Editor" Margin="0" VerticalAlignment="Top">
+                    <StackPanel Margin="8">
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox x:Name="StartEditorDebug" Content="-Debug" Margin="0" ToolTip="Start the editor using DebugGame binary instead of Development"/>
+                        </StackPanel>
+                        <GroupBox Header="Hmd Types" Height="60" Margin="5">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton x:Name="EditorNoHmd" Content="No Hmd" Margin="0" ToolTip="Do not use HMD even if there are devices connected."/>
+                                <RadioButton x:Name="EditorDefaultHmd" Content="Default" Margin="20,0,0,0" ToolTip="Use the default HMD device (chosen by engine) if there are multiple"/>
+                                <RadioButton x:Name="EditorGoogleVR" Content="Google VR" Margin="20,0,0,0"/>
+                                <RadioButton x:Name="EditorOcculus" Content="Occulus" Margin="20,0,0,0"/>
+                                <RadioButton x:Name="EditorSteamVR" Content="SteamVR" Margin="20,0,0,0"/>
+                            </StackPanel>
+                        </GroupBox>
+                        <Button x:Name="RunEditor" Content="Run Editor" Margin="0,10,0,0" Width="100" HorizontalAlignment="Left" Click="RunEditor_Click"/>
+                    </StackPanel>
+                </GroupBox>
+                
                 <GroupBox Header="Server" Margin="0" VerticalAlignment="Top">
                     <StackPanel Margin="8">
                         <StackPanel Orientation="Horizontal">
@@ -58,20 +76,20 @@
                 <GroupBox Header="Game" Margin="0" VerticalAlignment="Top">
                     <StackPanel Margin="8">
                         <StackPanel Orientation="Horizontal">
-                            <CheckBox x:Name="StartGameDebug" Content="-Debug" Margin="0" RenderTransformOrigin="0.506,0.346" ToolTip="Start the game using DebugGame binary instead of Development"/>
+                            <CheckBox x:Name="StartGameDebug" Content="-Debug" Margin="0" ToolTip="Start the game using DebugGame binary instead of Development"/>
                             <TextBlock Margin="20,0,0,0" TextWrapping="Wrap" Text="Game Instances:" ToolTip="Number of game instances that will be started"/>
                             <TextBox x:Name="GameInstances" Height="20" Margin="4,0,0,0" TextWrapping="Wrap" Text="1" Width="30"/>
                         </StackPanel>
                         <GroupBox Header="Hmd Types" Height="60" Margin="5">
                             <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="NoHmd" Content="No Hmd" Margin="0" ToolTip="Do not use HMD even if there are devices connected."/>
-                                <RadioButton x:Name="DefaultHmd" Content="Default" Margin="20,0,0,0" ToolTip="Use the default HMD device (chosen by engine) if there are multiple"/>
-                                <RadioButton x:Name="GoogleVR" Content="Google VR" Margin="20,0,0,0"/>
-                                <RadioButton x:Name="Occulus" Content="Occulus" Margin="20,0,0,0"/>
-                                <RadioButton x:Name="SteamVR" Content="SteamVR" Margin="20,0,0,0"/>
+                                <RadioButton x:Name="GameNoHmd" Content="No Hmd" Margin="0" ToolTip="Do not use HMD even if there are devices connected."/>
+                                <RadioButton x:Name="GameDefaultHmd" Content="Default" Margin="20,0,0,0" ToolTip="Use the default HMD device (chosen by engine) if there are multiple"/>
+                                <RadioButton x:Name="GameGoogleVR" Content="Google VR" Margin="20,0,0,0"/>
+                                <RadioButton x:Name="GameOcculus" Content="Occulus" Margin="20,0,0,0"/>
+                                <RadioButton x:Name="GameSteamVR" Content="SteamVR" Margin="20,0,0,0"/>
                             </StackPanel>
                         </GroupBox>
-                        <Button x:Name="Run" Content="Run Game" Margin="0,10,0,0" Width="100" Click="Run_Click" HorizontalAlignment="Left"/>
+                        <Button x:Name="RunGame" Content="Run Game" Margin="0,10,0,0" Width="100" Click="RunGame_Click" HorizontalAlignment="Left"/>
                     </StackPanel>
                 </GroupBox>
 

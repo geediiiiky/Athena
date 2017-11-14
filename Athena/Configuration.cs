@@ -26,8 +26,10 @@ namespace Athena
         public bool buildDebugGame = false;
         public bool startServerDebug = false;
         public bool startGameDebug = false;
+        public bool startEditorDebug = false;
         public int gameInstances = 1;
-        public HMDTypes hmdType = HMDTypes.Default;
+        public HMDTypes gameHmdType = HMDTypes.Default;
+        public HMDTypes editorHmdType = HMDTypes.Default;
         public RunParametersConfig gameParam = new RunParametersConfig();
         public RunParametersConfig serverParam = new RunParametersConfig();
     }
