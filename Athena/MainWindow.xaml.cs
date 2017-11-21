@@ -33,6 +33,10 @@ namespace Athena
         public MainWindow()
         {
             InitializeComponent();
+            string fqn = System.Reflection.Assembly.GetEntryAssembly().Location;
+            string dir = System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(fqn));
+            Title = "Athena - " + dir;
+
 
             gameHmdType2RadioButton = new Dictionary<HMDTypes, RadioButton> {
                 { HMDTypes.NoHmd, GameNoHmd },
