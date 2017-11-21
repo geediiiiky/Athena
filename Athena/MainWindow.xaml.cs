@@ -75,7 +75,7 @@ namespace Athena
             gameHmdType2RadioButton[config.userConfig.gameHmdType].IsChecked = true;
         }
 
-        private Process ExecuteCommand(string command, bool createNoWindow = false, bool dontWaitForExit = false)
+        private Process ExecuteCommand(string command, bool createNoWindow = false, bool disableMainWindow = true)
         {
             Console.WriteLine(command);
             var scriptName = command;
@@ -115,6 +115,11 @@ namespace Athena
             //processInfo.RedirectStandardError = true;
             //processInfo.RedirectStandardOutput = true;
 
+            if (disableMainWindow)
+            {
+                this.IsEnabled = false;
+            }
+
             var process = Process.Start(processInfo);
 
             //process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
@@ -125,20 +130,18 @@ namespace Athena
             //    Console.WriteLine("error>>" + e.Data);
             //process.BeginErrorReadLine();
 
-            if (!dontWaitForExit)
+            process.EnableRaisingEvents = true;
+            process.Exited += (object sender, System.EventArgs e) =>
             {
-                process.WaitForExit();
-                Console.WriteLine("ExitCode: {0}", process.ExitCode);
-                process.Close();
-            }
-            else
-            {
-                process.EnableRaisingEvents = true;
-                process.Exited += (object sender, System.EventArgs e) =>
+                if (disableMainWindow)
                 {
-                    process.Close();
-                };
-            }
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        this.IsEnabled = true;
+                    });
+                }
+                process.Close();
+            };
 
             return process;
         }
@@ -210,13 +213,17 @@ namespace Athena
             for (int i = 0; i < config.userConfig.gameInstances; ++i)
             {
                 string command = "RunAssociatedEngine.cmd -log -game -resx=1280 -resy=720 -windowed";
+                if (config.sharedConfig.runGameCommand != null && config.sharedConfig.runGameCommand.Length > 0)
+                {
+                    command = config.sharedConfig.runGameCommand;
+                }
                 if (config.userConfig.startGameDebug)
                 {
                     command += " -debug";
                 }
                 command += config.HmdTypeStrings[config.userConfig.gameHmdType];
                 command += " ";
-                command += GetExtraParameter(config.sharedConfig.gameParam, config.userConfig.gameParam, config.userConfig.gameExtraParamHash);
+                command += GetExtraParameter(config.sharedConfig.gameParam, config.userConfig.gameParam, config.userConfig.gameExtraParamHashes, i);
                 ExecuteCommand(command, true);
             }
         }
@@ -242,7 +249,7 @@ namespace Athena
             }
             command += config.HmdTypeStrings[config.userConfig.editorHmdType];
             command += " ";
-            command += GetExtraParameter(config.sharedConfig.editorParam, config.userConfig.editorParam, config.userConfig.editorExtraParamHash);
+            command += GetExtraParameter(config.sharedConfig.editorParam, config.userConfig.editorParam, config.userConfig.editorExtraParamHashes, -1);
             ExecuteCommand(command, true);
         }
 
@@ -252,12 +259,16 @@ namespace Athena
             Save();
 
             string command = "RunAssociatedEngine.cmd -log -server";
+            if (config.sharedConfig.runServerCommand != null && config.sharedConfig.runServerCommand.Length > 0)
+            {
+                command = config.sharedConfig.runServerCommand;
+            }
             if (config.userConfig.startGameDebug)
             {
                 command += " -debug";
             }
             command += " ";
-            command += GetExtraParameter(config.sharedConfig.serverParam, config.userConfig.serverParam, config.userConfig.serverExtraParamHash);
+            command += GetExtraParameter(config.sharedConfig.serverParam, config.userConfig.serverParam, config.userConfig.serverExtraParamHashes, -1);
             ExecuteCommand(command, true);
         }
 
@@ -300,7 +311,7 @@ namespace Athena
         {
             if (GitAutoFetchProcess == null)
             {
-                GitAutoFetchProcess = ExecuteCommand("FrequentlyFetch.bat", false, true);
+                GitAutoFetchProcess = ExecuteCommand("FrequentlyFetch.bat", false, false);
                 GitAutoFetchProcess.Exited += (object _sender, System.EventArgs _e) =>
                 {
                     GitAutoFetchProcess = null;
@@ -354,10 +365,10 @@ namespace Athena
 
         private void ServerParameters_Click(object sender, RoutedEventArgs e)
         {
-            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.serverParam, config.userConfig.serverParam, config.userConfig.serverExtraParamHash);
-            parameterWindow.ParameterModified += (int selectedHash) => 
+            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.serverParam, config.userConfig.serverParam, config.userConfig.serverExtraParamHashes);
+            parameterWindow.ParameterModified += (List<int> selectedHashes) => 
             {
-                config.userConfig.serverExtraParamHash = selectedHash;
+                config.userConfig.serverExtraParamHashes = selectedHashes;
                 Save();
             };
             parameterWindow.ShowDialog();
@@ -365,10 +376,10 @@ namespace Athena
 
         private void GameParameters_Click(object sender, RoutedEventArgs e)
         {
-            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.gameParam, config.userConfig.gameParam, config.userConfig.gameExtraParamHash);
-            parameterWindow.ParameterModified += (int selectedHash) =>
+            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.gameParam, config.userConfig.gameParam, config.userConfig.gameExtraParamHashes);
+            parameterWindow.ParameterModified += (List<int> selectedHashes) =>
             {
-                config.userConfig.gameExtraParamHash = selectedHash;
+                config.userConfig.gameExtraParamHashes = selectedHashes;
                 Save();
             };
             parameterWindow.ShowDialog();
@@ -376,20 +387,20 @@ namespace Athena
 
         private void EditorParameters_Click(object sender, RoutedEventArgs e)
         {
-            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.editorParam, config.userConfig.editorParam, config.userConfig.editorExtraParamHash);
-            parameterWindow.ParameterModified += (int selectedHash) =>
+            ParameterWindow parameterWindow = new ParameterWindow(config.sharedConfig.editorParam, config.userConfig.editorParam, config.userConfig.editorExtraParamHashes);
+            parameterWindow.ParameterModified += (List<int> selectedHashes) =>
             {
-                config.userConfig.editorExtraParamHash = selectedHash;
+                config.userConfig.editorExtraParamHashes = selectedHashes;
                 Save();
             };
             parameterWindow.ShowDialog();
         }
 
-        private string GetExtraParameter(RunParametersConfig shared, RunParametersConfig user, int selectedHash)
+        private string GetExtraParameter(RunParametersConfig shared, RunParametersConfig user, List<int> selectedHashes, int instance)
         {
             foreach (var param in shared.Parameters)
             {
-                if (param.Param.GetHashCode() == selectedHash)
+                if (selectedHashes.Contains(param.Param.GetHashCode()) && (instance == -1 || param.instance == instance))
                 {
                     return param.Param;
                 }
@@ -397,7 +408,7 @@ namespace Athena
 
             foreach (var param in user.Parameters)
             {
-                if (param.Param.GetHashCode() == selectedHash)
+                if (selectedHashes.Contains(param.Param.GetHashCode()) && (instance == -1 || param.instance == instance))
                 {
                     return param.Param;
                 }
@@ -406,6 +417,4 @@ namespace Athena
             return "";
         }
     }
-
-    
 }

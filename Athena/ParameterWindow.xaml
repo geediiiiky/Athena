@@ -10,6 +10,12 @@
         <StackPanel Margin="10">
             <ScrollViewer Height="200">
                 <StackPanel x:Name="ParametersContainer" Margin="0,0,10,0">
+                    <DockPanel>
+                        <TextBlock Text="Selected" Width="50"/>
+                        <TextBlock Text="Remove" DockPanel.Dock="Right"/>
+                        <TextBlock Text="Instance" Width="50"/>
+                        <TextBlock Text="Parameter"/>
+                    </DockPanel>
                 </StackPanel>
             </ScrollViewer>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">

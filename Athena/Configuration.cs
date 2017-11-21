@@ -33,9 +33,9 @@ namespace Athena
         public RunParametersConfig editorParam = new RunParametersConfig();
         public RunParametersConfig gameParam = new RunParametersConfig();
         public RunParametersConfig serverParam = new RunParametersConfig();
-        public int editorExtraParamHash = 0;
-        public int serverExtraParamHash = 0;
-        public int gameExtraParamHash = 0;
+        public List<int> editorExtraParamHashes = new List<int>();
+        public List<int> serverExtraParamHashes = new List<int>();
+        public List<int> gameExtraParamHashes = new List<int>();
     }
 
     public class SharedConfig
@@ -43,6 +43,8 @@ namespace Athena
         public RunParametersConfig editorParam = new RunParametersConfig();
         public RunParametersConfig gameParam = new RunParametersConfig();
         public RunParametersConfig serverParam = new RunParametersConfig();
+        public string runServerCommand;
+        public string runGameCommand;
     }
 
     public class AthenaConfig
@@ -133,6 +135,7 @@ namespace Athena
     {
         public struct RunParameter
         {
+            public int instance;
             public string Param;
         }
 
