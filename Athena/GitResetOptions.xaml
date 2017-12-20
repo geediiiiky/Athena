@@ -1,0 +1,15 @@
+﻿<Window x:Class="Athena.GitResetOptions"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Athena"
+        mc:Ignorable="d"
+        Title="Git reset options" Height="200" Width="300">
+    <Grid>
+        <Button x:Name="OnlyReset" Content="Only reset modified files." Margin="25,20,0,0" VerticalAlignment="Top" Width="250" HorizontalAlignment="Left" Click="OnlyReset_Click"/>
+        <Button x:Name="ResetAndCleanUntracked" Content="Reset and clean untracked files." Margin="25,60,0,0" VerticalAlignment="Top" Width="250" HorizontalAlignment="Left" Click="ResetAndCleanUntracked_Click"/>
+        <Button x:Name="ResetAndCleanAll" Content="Reset and clean untracked and ignored files." Margin="25,100,0,0" VerticalAlignment="Top" Width="250" HorizontalAlignment="Left" Click="ResetAndCleanAll_Click"/>
+
+    </Grid>
+</Window>

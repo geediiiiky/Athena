@@ -79,7 +79,7 @@ namespace Athena
             gameHmdType2RadioButton[config.userConfig.gameHmdType].IsChecked = true;
         }
 
-        private Process ExecuteCommand(string command, bool createNoWindow = false, bool disableMainWindow = true)
+        public Process ExecuteCommand(string command, bool createNoWindow = false, bool disableMainWindow = true)
         {
             Console.WriteLine(command);
             var scriptName = command;
@@ -316,15 +316,18 @@ namespace Athena
             if (GitAutoFetchProcess == null)
             {
                 GitAutoFetchProcess = ExecuteCommand("FrequentlyFetch.bat", false, false);
-                GitAutoFetchProcess.Exited += (object _sender, System.EventArgs _e) =>
+                if (GitAutoFetchProcess != null)
                 {
-                    GitAutoFetchProcess = null;
-                    this.Dispatcher.Invoke(() =>
+                    GitAutoFetchProcess.Exited += (object _sender, System.EventArgs _e) =>
                     {
-                        AutoFetch.IsEnabled = true;
-                    });
-                    
-                };
+                        GitAutoFetchProcess = null;
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            AutoFetch.IsEnabled = true;
+                        });
+
+                    };
+                }
 
                 AutoFetch.IsEnabled = false;
             }
@@ -419,6 +422,13 @@ namespace Athena
             }
 
             return "";
+        }
+
+        private void ResetGit_Click(object sender, RoutedEventArgs e)
+        {
+            //MessageBox.Show("Which action do you want to take?");
+            GitResetOptions resetGitOptions = new GitResetOptions(this);
+            resetGitOptions.ShowDialog();
         }
     }
 }

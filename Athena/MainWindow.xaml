@@ -103,6 +103,7 @@
                     <StackPanel Orientation="Horizontal" Margin="8">
                         <Button x:Name="SyncGit" Content="Sync" Margin="0,0,0,0" Width="100" Click="SyncGit_Click" ToolTip="fetch, lfs fetch, pull, and submodule update"/>
                         <Button x:Name="AutoFetch" Content="Auto Fetch" Margin="20,0,0,0" Width="100" Click="AutoFetch_Click" ToolTip="Automatically fetch and lfs fetch every given interval"/>
+                        <Button x:Name="ResetGit" Content="Reset" Margin="20,0,0,0" Width="100" ToolTip="Reset git repo and clean untracked files" Click="ResetGit_Click"/>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Frontend">
