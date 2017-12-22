@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using System.Diagnostics;
 using System.IO;
 using System.Management;
+using System.Text.RegularExpressions;
 
 namespace Athena
 {
@@ -82,12 +83,8 @@ namespace Athena
         public Process ExecuteCommand(string command, bool createNoWindow = false, bool disableMainWindow = true)
         {
             Console.WriteLine(command);
-            var scriptName = command;
-            var scriptLength = command.IndexOf(" ");
-            if (scriptLength > 0)
-            {
-                scriptName = command.Substring(0, scriptLength);
-            }
+            var scriptName = GetScriptFileName(command);
+            var arguments = command.Substring(command.IndexOf(scriptName, StringComparison.CurrentCultureIgnoreCase) + scriptName.Length);
             var scriptFound = false;
             if (File.Exists(scriptName))
             {
@@ -95,12 +92,13 @@ namespace Athena
             }
             else
             {
-                string[] folders = { @"script\", @"scripts\" };
+                string[] folders = { @"script", @"scripts", @"Script", @"Scripts" };
                 foreach (var folder in folders)
                 {
-                    if (File.Exists(folder + scriptName))
+                    var result = FindScript(new DirectoryInfo(folder), scriptName);
+                    if (result != null)
                     {
-                        command = folder + command;
+                        command = result + arguments;
                         scriptFound = true;
                         break;
                     }
@@ -148,6 +146,44 @@ namespace Athena
             };
 
             return process;
+        }
+
+        public string FindScript(DirectoryInfo directoryInfo, string scriptName)
+        {
+            if (directoryInfo.Exists)
+            {
+                foreach (var fi in directoryInfo.GetFiles())
+                {
+                    if (fi.Name.Equals(scriptName, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        return fi.FullName;
+                    }
+                }
+
+                foreach (var di in directoryInfo.GetDirectories())
+                {
+                    var result = FindScript(di, scriptName);
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public string GetScriptFileName(string scriptCommand)
+        {
+            var name = System.IO.Path.GetFileName(scriptCommand);
+            var match = Regex.Match(name, @"([A-Za-z0-9\-+=\s\.!%&$@{}\[\]'_])+\.([A-Za-z0-9\-+=!%&$@{}\[\]'_])+\s", RegexOptions.IgnoreCase);
+            var shortname = match.Value;
+            if (shortname == "")
+                shortname = name;
+            else
+                shortname = shortname.Substring(0, shortname.Length - 1);
+
+            return shortname;
         }
 
         private void GenerateProjectButton_Click(object sender, RoutedEventArgs e)
