@@ -161,7 +161,7 @@ namespace Athena
             }
             else
             {
-                ExecuteCommand("GenerateProjectFiles_2017.bat");
+                ExecuteCommand("GenerateProjectFiles.bat -2017");
             }
         }
 
